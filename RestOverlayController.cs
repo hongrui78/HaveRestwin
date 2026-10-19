@@ -37,6 +37,34 @@ public sealed class RestOverlayController : INotifyPropertyChanged
     public bool ShowExitButton => SettingsStore.Shared.ShowExitButton;
     public string ExitButtonText => L10n.E("Exit Now", "立即退出");
     public Visibility ExitButtonVisibility => ShowExitButton ? Visibility.Visible : Visibility.Collapsed;
+
+    /// 遮罩底色/文字色按休息类型取对应设置；底色 RGB 叠加透明度档位后渲染，文字色原样使用
+    public System.Windows.Media.Color PanelColor => Kind switch
+    {
+        BreakKind.Stand => ParseColor(SettingsStore.Shared.StandPanelRenderColor),
+        _ => ParseColor(SettingsStore.Shared.EyePanelRenderColor),
+    };
+    public System.Windows.Media.Color TextColor => Kind switch
+    {
+        BreakKind.Stand => ParseColor(SettingsStore.Shared.StandTextColor),
+        _ => ParseColor(SettingsStore.Shared.EyeTextColor),
+    };
+    public System.Windows.Media.Brush PanelBrush => new System.Windows.Media.SolidColorBrush(PanelColor);
+    public System.Windows.Media.Brush TextBrush => new System.Windows.Media.SolidColorBrush(TextColor);
+    public System.Windows.Media.Brush CountdownBrush
+    {
+        get
+        {
+            var c = TextColor;
+            return new System.Windows.Media.SolidColorBrush(
+                System.Windows.Media.Color.FromArgb((byte)(c.A * 0.6), c.R, c.G, c.B));
+        }
+    }
+
+    private static System.Windows.Media.Color ParseColor(string hex) =>
+        (System.Windows.Media.Color?)System.Windows.Media.ColorConverter.ConvertFromString(hex)
+        ?? System.Windows.Media.Colors.White;
+
     public ICommand DismissCommand { get; }
 
     private RestOverlayController()
@@ -47,6 +75,9 @@ public sealed class RestOverlayController : INotifyPropertyChanged
             OnChanged(nameof(ShowExitButton));
             OnChanged(nameof(ExitButtonVisibility));
             OnChanged(nameof(ExitButtonText));
+            OnChanged(nameof(PanelBrush));
+            OnChanged(nameof(TextBrush));
+            OnChanged(nameof(CountdownBrush));
         };
     }
 
@@ -59,9 +90,9 @@ public sealed class RestOverlayController : INotifyPropertyChanged
     public void BeginStandBreak(string message, int seconds, Action finished) =>
         Present(message, BreakKind.Stand, seconds, finished);
 
-    /// 设置页预览：无完成回调
-    public void Preview(string message, int seconds) =>
-        Present(message, BreakKind.EyeCountdown, seconds, null);
+    /// 设置页预览：按当前选中的眼睛/站立类型取色，无完成回调
+    public void Preview(string message, int seconds, BreakKind kind) =>
+        Present(message, kind, seconds, null);
 
     private void Present(string message, BreakKind kind, int seconds, Action? finished)
     {
@@ -89,6 +120,9 @@ public sealed class RestOverlayController : INotifyPropertyChanged
         OnChanged(nameof(IsClosed));
         OnChanged(nameof(Message));
         OnChanged(nameof(RemainingText));
+        OnChanged(nameof(PanelBrush));
+        OnChanged(nameof(TextBrush));
+        OnChanged(nameof(CountdownBrush));
 
         // 所有类型统一走实时倒计时：Remaining 每秒递减，归 0 自动关闭
         countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };

@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,11 +45,56 @@ public partial class SettingsWindow : Window
         StandPanel.Visibility = eye ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    private void PreviewEye_Click(object sender, RoutedEventArgs e) =>
-        RestOverlayController.Shared.Preview(EyePreviewText.Text, settings.EyeBreakSeconds);
+    private void Preview_Click(object sender, RoutedEventArgs e)
+    {
+        if (RadioEye?.IsChecked == true)
+            RestOverlayController.Shared.Preview(EyePreviewText.Text, settings.EyeBreakSeconds,
+                RestOverlayController.BreakKind.EyeCountdown);
+        else
+            RestOverlayController.Shared.Preview(StandPreviewText.Text, settings.StandBreakSeconds,
+                RestOverlayController.BreakKind.Stand);
+    }
 
-    private void PreviewStand_Click(object sender, RoutedEventArgs e) =>
-        RestOverlayController.Shared.Preview(StandPreviewText.Text, settings.StandBreakSeconds);
+    // MARK: - 遮罩取色（点色块直接弹系统 ColorDialog）
+
+    private void Swatch_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: string key }) return;
+        string current = key switch
+        {
+            "eyePanel" => settings.EyePanelColor,
+            "eyeText" => settings.EyeTextColor,
+            "standPanel" => settings.StandPanelColor,
+            _ => settings.StandTextColor,
+        };
+        var argb = (System.Windows.Media.Color?)System.Windows.Media.ColorConverter
+            .ConvertFromString(current) ?? System.Windows.Media.Colors.Black;
+        using var dialog = new System.Windows.Forms.ColorDialog
+        {
+            FullOpen = true,
+            Color = System.Drawing.Color.FromArgb(argb.R, argb.G, argb.B),
+        };
+        if (dialog.ShowDialog(new Win32Owner(Window.GetWindow(this))) != System.Windows.Forms.DialogResult.OK) return;
+        string hex = $"#{dialog.Color.R:X2}{dialog.Color.G:X2}{dialog.Color.B:X2}";
+        switch (key)
+        {
+            case "eyePanel": settings.EyePanelColor = hex; break;
+            case "eyeText": settings.EyeTextColor = hex; break;
+            case "standPanel": settings.StandPanelColor = hex; break;
+            default: settings.StandTextColor = hex; break;
+        }
+    }
+
+    /// 把 WPF 窗口句柄包给 WinForms 对话框当 Owner
+    private sealed class Win32Owner : System.Windows.Forms.IWin32Window
+    {
+        private readonly Window? window;
+        public Win32Owner(Window? window) => this.window = window;
+        public IntPtr Handle =>
+            window is null || !window.IsLoaded
+                ? IntPtr.Zero
+                : new System.Windows.Interop.WindowInteropHelper(window).Handle;
+    }
 
     // MARK: - 文案刷新
 
@@ -83,7 +129,6 @@ public partial class SettingsWindow : Window
         EyeDisplayTitle.Text = L10n.E("Display", "显示");
         EyeMsgLabel.Text = L10n.E("Eye Rest Prompt", "休息提示文字");
         EyePreviewCaption.Text = L10n.E("Preview", "预览");
-        EyePreviewButton.Content = L10n.E("Preview Prompt", "预览提示面板");
 
         StandPlanTitle.Text = L10n.E("Schedule", "计划");
         StandEveryLabel.Text = L10n.E("Every", "每");
@@ -93,7 +138,14 @@ public partial class SettingsWindow : Window
         StandDisplayTitle.Text = L10n.E("Display", "显示");
         StandMsgLabel.Text = L10n.E("Stand Prompt", "站立提示文字");
         StandPreviewCaption.Text = L10n.E("Preview", "预览");
-        StandPreviewButton.Content = L10n.E("Preview Prompt", "预览提示面板");
+
+        EyePanelColorLabel.Text = L10n.E("Panel Color", "面板颜色");
+        EyeTextColorLabel.Text = L10n.E("Text Color", "文字颜色");
+        StandPanelColorLabel.Text = L10n.E("Panel Color", "面板颜色");
+        StandTextColorLabel.Text = L10n.E("Text Color", "文字颜色");
+        EyeOpacityLabel.Text = L10n.E("Opacity", "透明度");
+        StandOpacityLabel.Text = L10n.E("Opacity", "透明度");
+        PreviewButton.Content = L10n.E("Preview", "预览");
 
         AboutName.Text = L10n.AppName;
         AboutVersion.Text = L10n.E($"Version {ShortVersion()}", $"版本 {ShortVersion()}");

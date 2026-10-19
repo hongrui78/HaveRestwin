@@ -55,14 +55,46 @@
                                  Text="{Binding EyeMessage, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                     </StackPanel>
                     <TextBlock x:Name="EyePreviewCaption" Foreground="Gray" Margin="0,0,0,4"/>
-                    <Border Background="#FFF7F7" BorderBrush="#DDD" BorderThickness="1"
+                    <Border Background="{Binding EyePanelRenderColor}" BorderBrush="#DDD" BorderThickness="1"
                             CornerRadius="6" Height="110" Margin="0,0,0,8">
                         <TextBlock x:Name="EyePreviewText" FontSize="30" FontWeight="Bold"
+                                   Foreground="{Binding EyeTextColor}"
                                    TextAlignment="Center" TextWrapping="Wrap"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <Button x:Name="EyePreviewButton" HorizontalAlignment="Left" Padding="10,4"
-                            Click="PreviewEye_Click"/>
+                    <DockPanel LastChildFill="False" Margin="0,10,0,0">
+                        <TextBlock x:Name="EyePanelColorLabel" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                        <Button DockPanel.Dock="Left" Width="36" Height="18" Margin="8,0,0,0"
+                                Background="{Binding EyePanelRenderColor}" Click="Swatch_Click" Tag="eyePanel">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" BorderBrush="#999999"
+                                            BorderThickness="1" CornerRadius="2" Cursor="Hand"/>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <Slider x:Name="EyeOpacitySlider" DockPanel.Dock="Right" Width="96"
+                                Minimum="0" Maximum="100" TickFrequency="10" IsSnapToTickEnabled="True"
+                                VerticalAlignment="Center" Value="{Binding EyePanelOpacity, Mode=TwoWay}"/>
+                        <TextBlock DockPanel.Dock="Right" Text="%" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBox x:Name="EyeOpacityBox" DockPanel.Dock="Right" Width="36" Margin="0,0,4,0"
+                                 TextAlignment="Center" VerticalAlignment="Center"
+                                 Text="{Binding EyePanelOpacity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                        <TextBlock x:Name="EyeOpacityLabel" DockPanel.Dock="Right"
+                                   VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBlock x:Name="EyeTextColorLabel" VerticalAlignment="Center"/>
+                        <Button Width="36" Height="18" Margin="8,0,0,0"
+                                Background="{Binding EyeTextColor}" Click="Swatch_Click" Tag="eyeText">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" BorderBrush="#999999"
+                                            BorderThickness="1" CornerRadius="2" Cursor="Hand"/>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
 
                 <StackPanel x:Name="StandPanel" Visibility="Collapsed">
@@ -84,15 +116,50 @@
                                  Text="{Binding StandMessage, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                     </StackPanel>
                     <TextBlock x:Name="StandPreviewCaption" Foreground="Gray" Margin="0,0,0,4"/>
-                    <Border Background="#FFF7F7" BorderBrush="#DDD" BorderThickness="1"
+                    <Border Background="{Binding StandPanelRenderColor}" BorderBrush="#DDD" BorderThickness="1"
                             CornerRadius="6" Height="110" Margin="0,0,0,8">
                         <TextBlock x:Name="StandPreviewText" FontSize="30" FontWeight="Bold"
+                                   Foreground="{Binding StandTextColor}"
                                    TextAlignment="Center" TextWrapping="Wrap"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <Button x:Name="StandPreviewButton" HorizontalAlignment="Left" Padding="10,4"
-                            Click="PreviewStand_Click"/>
+                    <DockPanel LastChildFill="False" Margin="0,10,0,0">
+                        <TextBlock x:Name="StandPanelColorLabel" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                        <Button DockPanel.Dock="Left" Width="36" Height="18" Margin="8,0,0,0"
+                                Background="{Binding StandPanelRenderColor}" Click="Swatch_Click" Tag="standPanel">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" BorderBrush="#999999"
+                                            BorderThickness="1" CornerRadius="2" Cursor="Hand"/>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <Slider x:Name="StandOpacitySlider" DockPanel.Dock="Right" Width="96"
+                                Minimum="0" Maximum="100" TickFrequency="10" IsSnapToTickEnabled="True"
+                                VerticalAlignment="Center" Value="{Binding StandPanelOpacity, Mode=TwoWay}"/>
+                        <TextBlock DockPanel.Dock="Right" Text="%" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBox x:Name="StandOpacityBox" DockPanel.Dock="Right" Width="36" Margin="0,0,4,0"
+                                 TextAlignment="Center" VerticalAlignment="Center"
+                                 Text="{Binding StandPanelOpacity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                        <TextBlock x:Name="StandOpacityLabel" DockPanel.Dock="Right"
+                                   VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBlock x:Name="StandTextColorLabel" VerticalAlignment="Center"/>
+                        <Button Width="36" Height="18" Margin="8,0,0,0"
+                                Background="{Binding StandTextColor}" Click="Swatch_Click" Tag="standText">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" BorderBrush="#999999"
+                                            BorderThickness="1" CornerRadius="2" Cursor="Hand"/>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
+
+                <Button x:Name="PreviewButton" HorizontalAlignment="Center" Margin="0,14,0,0"
+                        Padding="20,4" Click="Preview_Click"/>
             </StackPanel>
         </TabItem>
 

@@ -9,20 +9,20 @@
         ShowActivated="False"
         Topmost="True"
         Cursor="Arrow"
-        Background="#E5FFFFFF">
-    <!-- 90% 白色蒙层：E5 ≈ 0.90 alpha，对应 Mac 版 veilAlpha -->
+        Background="{Binding PanelBrush}">
+    <!-- 底色/文字色来自设置（眼睛、站立各一套），默认 90% 白 + 黑字对应 Mac 版 veilAlpha -->
     <Grid>
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock x:Name="MessageText"
                        Text="{Binding Message}"
                        FontSize="52" FontWeight="Bold"
-                       Foreground="Black"
+                       Foreground="{Binding TextBrush}"
                        TextAlignment="Center" TextWrapping="Wrap"
                        MaxWidth="1200"
                        Margin="40,0,40,0"/>
             <TextBlock Text="{Binding RemainingText}"
                        FontFamily="Consolas" FontSize="24"
-                       Foreground="#99000000"
+                       Foreground="{Binding CountdownBrush}"
                        HorizontalAlignment="Center"
                        Margin="0,26,0,0"/>
             <Button Content="{Binding ExitButtonText}"

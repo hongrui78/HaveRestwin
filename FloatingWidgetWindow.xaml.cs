@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace HaveRestwin;
@@ -59,25 +60,55 @@ public partial class FloatingWidgetWindow : Window
 
     // MARK: - 面板展开/收起与对齐
 
+    private const double FadeInSec = 1.0;
+    private const double FadeOutSec = 1.0;
+    private bool panelFadingOut;
+
+    private void AnimatePanelOpacity(double from, double to, double seconds, Action? done)
+    {
+        var anim = new DoubleAnimation(from, to, TimeSpan.FromSeconds(seconds))
+        {
+            EasingFunction = new CircleEase { EasingMode = EasingMode.EaseOut },
+        };
+        if (done != null) anim.Completed += (_, _) => done();
+        Panel.BeginAnimation(UIElement.OpacityProperty, anim, HandoffBehavior.Compose);
+    }
+
     private void ExpandPanel()
     {
         if (!RestOverlayController.Shared.IsClosed) return;
         collapseTimer.Stop();
+        if (panelFadingOut)
+        {
+            // 淡出途中鼠标又进来：动画会停在中间值，直接接管重新淡入
+            panelFadingOut = false;
+            Panel.BeginAnimation(UIElement.OpacityProperty, null);
+            Panel.Visibility = Visibility.Collapsed;
+        }
+        if (Panel.Visibility == Visibility.Visible) return;
+        Panel.Opacity = 0;
         Panel.Visibility = Visibility.Visible;
         UpdateAll();
         AlignPanel();
+        AnimatePanelOpacity(0, 1, FadeInSec, null);
     }
 
     private void CollapsePanel()
     {
         collapseTimer.Stop();
-        if (Panel.Visibility != Visibility.Visible) return;
-        // 展开时可能把窗口整体左移过，收起时把窗口挪回计时球的位置
-        double pillScreenLeft = Left + Pill.Margin.Left;
-        Panel.Visibility = Visibility.Collapsed;
-        Pill.Margin = new Thickness(0);
-        Panel.Margin = new Thickness(0, 6, 0, 0);
-        Left = pillScreenLeft;
+        if (panelFadingOut || Panel.Visibility != Visibility.Visible) return;
+        panelFadingOut = true;
+        AnimatePanelOpacity(1, 0, FadeOutSec, () =>
+        {
+            panelFadingOut = false;
+            // 展开时可能把窗口整体左移过，收起时把窗口挪回计时球的位置
+            double pillScreenLeft = Left + Pill.Margin.Left;
+            Panel.Visibility = Visibility.Collapsed;
+            Panel.Opacity = 1;
+            Pill.Margin = new Thickness(0);
+            Panel.Margin = new Thickness(0, 6, 0, 0);
+            Left = pillScreenLeft;
+        });
     }
 
     private void AlignPanel()

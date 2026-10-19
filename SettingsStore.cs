@@ -26,6 +26,8 @@ public sealed class SettingsStore : INotifyPropertyChanged
     private bool standEnabled, launchAtLogin;
     private int standBreakSeconds, eyeFrequencyMinutes, eyeBreakSeconds, standMinutes;
     private string eyeMessage, standMessage;
+    private string eyePanelColor, eyeTextColor, standPanelColor, standTextColor;
+    private int eyePanelOpacity, standPanelOpacity;
 
     public string AppLanguage
     {
@@ -84,6 +86,66 @@ public sealed class SettingsStore : INotifyPropertyChanged
         get => standMessage;
         set { if (standMessage == value) return; standMessage = value; OnChanged(); OnEdited(); }
     }
+    // 休息遮罩配色（#AARRGGBB），眼睛/站立各一套；6 位 RGB 输入自动补全不透明
+    public string EyePanelColor
+    {
+        get => eyePanelColor;
+        set { if (TryNormalizeColor(value, out var c)) { if (eyePanelColor != c) { eyePanelColor = c; OnChanged(); OnChanged(nameof(EyePanelRenderColor)); OnEdited(); } } }
+    }
+    public string EyeTextColor
+    {
+        get => eyeTextColor;
+        set { if (TryNormalizeColor(value, out var c)) { if (eyeTextColor != c) { eyeTextColor = c; OnChanged(); OnEdited(); } } }
+    }
+    public string StandPanelColor
+    {
+        get => standPanelColor;
+        set { if (TryNormalizeColor(value, out var c)) { if (standPanelColor != c) { standPanelColor = c; OnChanged(); OnChanged(nameof(StandPanelRenderColor)); OnEdited(); } } }
+    }
+    public string StandTextColor
+    {
+        get => standTextColor;
+        set { if (TryNormalizeColor(value, out var c)) { if (standTextColor != c) { standTextColor = c; OnChanged(); OnEdited(); } } }
+    }
+    /// 遮罩底板不透明度 0~100（滑块 10% 一档，输入框可任意）；只作用于底板颜色
+    public int EyePanelOpacity
+    {
+        get => eyePanelOpacity;
+        set { var v = Math.Clamp(value, 0, 100); if (eyePanelOpacity == v) return; eyePanelOpacity = v; OnChanged(); OnChanged(nameof(EyePanelRenderColor)); OnEdited(); }
+    }
+    public int StandPanelOpacity
+    {
+        get => standPanelOpacity;
+        set { var v = Math.Clamp(value, 0, 100); if (standPanelOpacity == v) return; standPanelOpacity = v; OnChanged(); OnChanged(nameof(StandPanelRenderColor)); OnEdited(); }
+    }
+    /// 实际渲染色：底板 RGB + 透明度档位合成的 #AARRGGBB
+    public string EyePanelRenderColor => WithOpacity(eyePanelColor, eyePanelOpacity);
+    public string StandPanelRenderColor => WithOpacity(standPanelColor, standPanelOpacity);
+
+    private static string WithOpacity(string hex, int opacity)
+    {
+        var c = (System.Windows.Media.Color?)System.Windows.Media.ColorConverter.ConvertFromString(hex)
+                ?? System.Windows.Media.Colors.White;
+        byte a = (byte)Math.Round(opacity * 255.0 / 100.0);
+        return $"#{a:X2}{c.R:X2}{c.G:X2}{c.B:X2}";
+    }
+
+    private static bool TryNormalizeColor(string? s, out string normalized)
+    {
+        normalized = s ?? "";
+        if (s == null || s[0] != '#') return false;
+        try
+        {
+            if (s.Length == 7) { normalized = "#FF" + s.Substring(1); return true; }
+            if (s.Length == 9)
+            {
+                _ = System.Windows.Media.ColorConverter.ConvertFromString(s);
+                return true;
+            }
+        }
+        catch { }
+        return false;
+    }
     public bool LaunchAtLogin
     {
         get => launchAtLogin;
@@ -110,6 +172,12 @@ public sealed class SettingsStore : INotifyPropertyChanged
         eyeMessage = dto.EyeMessage ?? L10n.EyeZhDefault;
         standMinutes = dto.StandMinutes ?? 45;
         standMessage = dto.StandMessage ?? L10n.StandZhDefault;
+        eyePanelColor = dto.EyePanelColor ?? "#FFFFFFFF";
+        eyeTextColor = dto.EyeTextColor ?? "#FF000000";
+        standPanelColor = dto.StandPanelColor ?? "#FFFFF3D8";
+        standTextColor = dto.StandTextColor ?? "#FF000000";
+        eyePanelOpacity = dto.EyePanelOpacity ?? 50;
+        standPanelOpacity = dto.StandPanelOpacity ?? 50;
         launchAtLogin = ReadLoginItem();
         observing = true;
 
@@ -174,6 +242,12 @@ public sealed class SettingsStore : INotifyPropertyChanged
         EyeMessage = eyeMessage,
         StandMinutes = standMinutes,
         StandMessage = standMessage,
+        EyePanelColor = eyePanelColor,
+        EyeTextColor = eyeTextColor,
+        StandPanelColor = standPanelColor,
+        StandTextColor = standTextColor,
+        EyePanelOpacity = eyePanelOpacity,
+        StandPanelOpacity = standPanelOpacity,
     };
 
     // MARK: - 开机自启（HKCU Run 键）
@@ -246,6 +320,12 @@ public sealed class SettingsStore : INotifyPropertyChanged
         [JsonPropertyName("eyeMessage")] public string? EyeMessage { get; set; }
         [JsonPropertyName("standMinutes")] public int? StandMinutes { get; set; }
         [JsonPropertyName("standMessage")] public string? StandMessage { get; set; }
+        [JsonPropertyName("eyePanelColor")] public string? EyePanelColor { get; set; }
+        [JsonPropertyName("eyeTextColor")] public string? EyeTextColor { get; set; }
+        [JsonPropertyName("standPanelColor")] public string? StandPanelColor { get; set; }
+        [JsonPropertyName("standTextColor")] public string? StandTextColor { get; set; }
+        [JsonPropertyName("eyePanelOpacity")] public int? EyePanelOpacity { get; set; }
+        [JsonPropertyName("standPanelOpacity")] public int? StandPanelOpacity { get; set; }
 
         public static DiskSettings Load()
         {
