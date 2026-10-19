@@ -1,0 +1,36 @@
+<Window x:Class="HaveRestwin.RestOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="RestOverlay"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        Cursor="Arrow"
+        Background="#E5FFFFFF">
+    <!-- 90% 白色蒙层：E5 ≈ 0.90 alpha，对应 Mac 版 veilAlpha -->
+    <Grid>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock x:Name="MessageText"
+                       Text="{Binding Message}"
+                       FontSize="52" FontWeight="Bold"
+                       Foreground="Black"
+                       TextAlignment="Center" TextWrapping="Wrap"
+                       MaxWidth="1200"
+                       Margin="40,0,40,0"/>
+            <TextBlock Text="{Binding RemainingText}"
+                       FontFamily="Consolas" FontSize="24"
+                       Foreground="#99000000"
+                       HorizontalAlignment="Center"
+                       Margin="0,26,0,0"/>
+            <Button Content="{Binding ExitButtonText}"
+                    Command="{Binding DismissCommand}"
+                    Visibility="{Binding ExitButtonVisibility}"
+                    FontSize="16" Padding="20,8"
+                    HorizontalAlignment="Center"
+                    Margin="0,26,0,0"/>
+        </StackPanel>
+    </Grid>
+</Window>

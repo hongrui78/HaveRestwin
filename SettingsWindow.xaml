@@ -1,0 +1,123 @@
+<Window x:Class="HaveRestwin.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设置"
+        Width="380" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <TabControl Margin="8">
+        <!-- ======================= 通用 ======================= -->
+        <TabItem x:Name="GeneralTab">
+            <StackPanel Margin="14" >
+                <DockPanel LastChildFill="False" Margin="0,0,0,10">
+                    <TextBlock x:Name="LanguageLabel" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="LanguageCombo" DockPanel.Dock="Right" Width="150"
+                              SelectedValuePath="Tag" SelectionChanged="Language_Changed">
+                        <ComboBoxItem x:Name="LangSystemItem" Tag="system"/>
+                        <ComboBoxItem x:Name="LangEnglishItem" Tag="english" Content="English"/>
+                        <ComboBoxItem x:Name="LangSimplifiedItem" Tag="chinese"/>
+                        <ComboBoxItem x:Name="LangTraditionalItem" Tag="traditional"/>
+                    </ComboBox>
+                </DockPanel>
+                <CheckBox x:Name="LaunchCheck" Margin="0,4" IsChecked="{Binding LaunchAtLogin, Mode=TwoWay}"/>
+                <CheckBox x:Name="ShowTimerCheck" Margin="0,4" IsChecked="{Binding ShowTimerInFloating, Mode=TwoWay}"/>
+                <CheckBox x:Name="SoundCheck" Margin="0,4" IsChecked="{Binding PlaySoundOnBreakEnd, Mode=TwoWay}"/>
+                <CheckBox x:Name="ExitBtnCheck" Margin="0,4" IsChecked="{Binding ShowExitButton, Mode=TwoWay}"/>
+                <CheckBox x:Name="IdlePauseCheck" Margin="0,4"
+                          IsChecked="{Binding IdlePauseEnabled, Mode=TwoWay}"
+                          Checked="IdleLayout_Invalidate" Unchecked="IdleLayout_Invalidate"/>
+                <StackPanel x:Name="IdleMinutesRow" Orientation="Horizontal" Margin="24,2,0,4">
+                    <TextBlock x:Name="IdleMinutesLabel" VerticalAlignment="Center" FontFamily="Consolas"/>
+                    <TextBox x:Name="IdleMinutesBox" Width="44" Margin="6,0,0,0"
+                             TextAlignment="Center"
+                             Text="{Binding IdlePauseMinutes, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                    <TextBlock x:Name="IdleMinutesUnit" Margin="6,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <CheckBox x:Name="StandEnabledCheck" Margin="0,4"
+                          IsChecked="{Binding StandEnabled, Mode=TwoWay}"/>
+            </StackPanel>
+        </TabItem>
+
+        <!-- ======================= 休息 ======================= -->
+        <TabItem x:Name="RestTab">
+            <StackPanel Margin="14">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12">
+                    <RadioButton x:Name="RadioEye" IsChecked="True" Checked="Kind_Changed" Margin="0,0,12,0"/>
+                    <RadioButton x:Name="RadioStand" Checked="Kind_Changed"/>
+                </StackPanel>
+
+                <StackPanel x:Name="EyePanel">
+                    <TextBlock x:Name="EyePlanTitle" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock x:Name="EyeEveryLabel" VerticalAlignment="Center"/>
+                        <TextBox Width="48" Margin="5,0" TextAlignment="Center"
+                                 Text="{Binding EyeFrequencyMinutes, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                        <TextBlock x:Name="EyeMinLabel" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBlock x:Name="EyeRestLabel" VerticalAlignment="Center"/>
+                        <TextBox Width="48" Margin="5,0" TextAlignment="Center"
+                                 Text="{Binding EyeBreakSeconds, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                        <TextBlock x:Name="EyeSecLabel" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock x:Name="EyeDisplayTitle" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock x:Name="EyeMsgLabel" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Width="200"
+                                 Text="{Binding EyeMessage, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                    </StackPanel>
+                    <TextBlock x:Name="EyePreviewCaption" Foreground="Gray" Margin="0,0,0,4"/>
+                    <Border Background="#FFF7F7" BorderBrush="#DDD" BorderThickness="1"
+                            CornerRadius="6" Height="110" Margin="0,0,0,8">
+                        <TextBlock x:Name="EyePreviewText" FontSize="30" FontWeight="Bold"
+                                   TextAlignment="Center" TextWrapping="Wrap"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <Button x:Name="EyePreviewButton" HorizontalAlignment="Left" Padding="10,4"
+                            Click="PreviewEye_Click"/>
+                </StackPanel>
+
+                <StackPanel x:Name="StandPanel" Visibility="Collapsed">
+                    <TextBlock x:Name="StandPlanTitle" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock x:Name="StandEveryLabel" VerticalAlignment="Center"/>
+                        <TextBox Width="48" Margin="5,0" TextAlignment="Center"
+                                 Text="{Binding StandMinutes, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                        <TextBlock x:Name="StandMinLabel" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBlock x:Name="StandRestLabel" VerticalAlignment="Center"/>
+                        <TextBox Width="48" Margin="5,0" TextAlignment="Center"
+                                 Text="{Binding StandBreakSeconds, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                        <TextBlock x:Name="StandSecLabel" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock x:Name="StandDisplayTitle" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock x:Name="StandMsgLabel" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Width="200"
+                                 Text="{Binding StandMessage, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                    </StackPanel>
+                    <TextBlock x:Name="StandPreviewCaption" Foreground="Gray" Margin="0,0,0,4"/>
+                    <Border Background="#FFF7F7" BorderBrush="#DDD" BorderThickness="1"
+                            CornerRadius="6" Height="110" Margin="0,0,0,8">
+                        <TextBlock x:Name="StandPreviewText" FontSize="30" FontWeight="Bold"
+                                   TextAlignment="Center" TextWrapping="Wrap"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <Button x:Name="StandPreviewButton" HorizontalAlignment="Left" Padding="10,4"
+                            Click="PreviewStand_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </TabItem>
+
+        <!-- ======================= 关于 ======================= -->
+        <TabItem x:Name="AboutTab">
+            <StackPanel Margin="20" HorizontalAlignment="Center">
+                <TextBlock Text="&#xE708;" FontFamily="Segoe MDL2 Assets" FontSize="44"
+                           Foreground="Gray" HorizontalAlignment="Center" Margin="0,10,0,10"/>
+                <TextBlock x:Name="AboutName" FontSize="22" FontWeight="SemiBold"
+                           HorizontalAlignment="Center"/>
+                <TextBlock x:Name="AboutVersion" Foreground="Gray"
+                           HorizontalAlignment="Center" Margin="0,6,0,6"/>
+                <TextBlock x:Name="AboutTagline" Foreground="Gray" TextAlignment="Center"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+</Window>

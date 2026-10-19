@@ -1,0 +1,6 @@
+bin/
+obj/
+dist/*.exe
+dist/*.pdb
+*.user
+.vs/
