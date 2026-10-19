@@ -23,16 +23,6 @@
                 <CheckBox x:Name="ShowTimerCheck" Margin="0,4" IsChecked="{Binding ShowTimerInFloating, Mode=TwoWay}"/>
                 <CheckBox x:Name="SoundCheck" Margin="0,4" IsChecked="{Binding PlaySoundOnBreakEnd, Mode=TwoWay}"/>
                 <CheckBox x:Name="ExitBtnCheck" Margin="0,4" IsChecked="{Binding ShowExitButton, Mode=TwoWay}"/>
-                <CheckBox x:Name="IdlePauseCheck" Margin="0,4"
-                          IsChecked="{Binding IdlePauseEnabled, Mode=TwoWay}"
-                          Checked="IdleLayout_Invalidate" Unchecked="IdleLayout_Invalidate"/>
-                <StackPanel x:Name="IdleMinutesRow" Orientation="Horizontal" Margin="24,2,0,4">
-                    <TextBlock x:Name="IdleMinutesLabel" VerticalAlignment="Center" FontFamily="Consolas"/>
-                    <TextBox x:Name="IdleMinutesBox" Width="44" Margin="6,0,0,0"
-                             TextAlignment="Center"
-                             Text="{Binding IdlePauseMinutes, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
-                    <TextBlock x:Name="IdleMinutesUnit" Margin="6,0,0,0" VerticalAlignment="Center"/>
-                </StackPanel>
                 <CheckBox x:Name="StandEnabledCheck" Margin="0,4"
                           IsChecked="{Binding StandEnabled, Mode=TwoWay}"/>
             </StackPanel>

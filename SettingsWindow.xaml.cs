@@ -36,13 +36,6 @@ public partial class SettingsWindow : Window
             settings.AppLanguage = lang;
     }
 
-    private void IdleLayout_Invalidate(object sender, RoutedEventArgs e)
-    {
-        if (IdleMinutesRow == null || IdlePauseCheck == null) return;
-        IdleMinutesRow.Visibility = IdlePauseCheck.IsChecked == true
-            ? Visibility.Visible : Visibility.Collapsed;
-    }
-
     private void Kind_Changed(object sender, RoutedEventArgs e)
     {
         if (EyePanel == null || StandPanel == null) return;
@@ -77,11 +70,6 @@ public partial class SettingsWindow : Window
         ShowTimerCheck.Content = L10n.E("Show Timer", "悬浮窗显示计时");
         SoundCheck.Content = L10n.E("Play Sound When Rest Ends", "休息结束播放声音");
         ExitBtnCheck.Content = L10n.E("Show Exit Button on Prompt", "提示面板显示退出按钮");
-        IdlePauseCheck.Content = L10n.E("Pause When Idle", "无操作暂停计时");
-        IdleMinutesLabel.Text = L10n.E(
-            $"Pause after {settings.IdlePauseMinutes} min idle",
-            $"空闲 {settings.IdlePauseMinutes} 分钟后暂停");
-        IdleMinutesUnit.Text = L10n.E("min", "分钟");
         StandEnabledCheck.Content = L10n.E("Enable Stand Reminders", "开启站立提醒");
 
         RadioEye.Content = L10n.E("Eyes", "眼睛");
@@ -115,7 +103,6 @@ public partial class SettingsWindow : Window
 
         UpdateEyePreview();
         UpdateStandPreview();
-        IdleLayout_Invalidate(this, new RoutedEventArgs());
     }
 
     private void UpdateEyePreview()

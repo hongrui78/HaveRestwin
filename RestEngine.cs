@@ -124,13 +124,7 @@ public sealed class RestEngine : INotifyPropertyChanged
 
     private void RefreshIdlePauseState(double idleSeconds)
     {
-        if (!settings.IdlePauseEnabled)
-        {
-            // 只恢复空闲自动暂停的，不动用户手动暂停的
-            if (autoPausedByIdle) { autoPausedByIdle = false; ResumeFromIdlePause(); }
-            return;
-        }
-        if (idleSeconds >= settings.IdlePauseMinutes * 60.0)
+        if (idleSeconds >= SettingsStore.IdlePauseMinutes * 60.0)
         {
             if (!autoPausedByIdle && Status == State.Active)
             {

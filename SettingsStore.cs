@@ -23,8 +23,8 @@ public sealed class SettingsStore : INotifyPropertyChanged
 
     private string appLanguage;
     private bool showTimerInFloating, playSoundOnBreakEnd, showExitButton;
-    private bool idlePauseEnabled, standEnabled, launchAtLogin;
-    private int idlePauseMinutes, standBreakSeconds, eyeFrequencyMinutes, eyeBreakSeconds, standMinutes;
+    private bool standEnabled, launchAtLogin;
+    private int standBreakSeconds, eyeFrequencyMinutes, eyeBreakSeconds, standMinutes;
     private string eyeMessage, standMessage;
 
     public string AppLanguage
@@ -47,16 +47,8 @@ public sealed class SettingsStore : INotifyPropertyChanged
         get => showExitButton;
         set { if (showExitButton == value) return; showExitButton = value; OnChanged(); OnEdited(); }
     }
-    public bool IdlePauseEnabled
-    {
-        get => idlePauseEnabled;
-        set { if (idlePauseEnabled == value) return; idlePauseEnabled = value; OnChanged(); OnEdited(); }
-    }
-    public int IdlePauseMinutes
-    {
-        get => idlePauseMinutes;
-        set { if (idlePauseMinutes == value || value < 1 || value > 120) return; idlePauseMinutes = value; OnChanged(); OnEdited(); }
-    }
+    /// 空闲自动暂停固定开启：无操作满 1 分钟暂停计时，不再作为设置项暴露
+    public const int IdlePauseMinutes = 1;
     public bool StandEnabled
     {
         get => standEnabled;
@@ -111,8 +103,6 @@ public sealed class SettingsStore : INotifyPropertyChanged
         showTimerInFloating = dto.ShowTimerInFloating ?? true;
         playSoundOnBreakEnd = dto.PlaySoundOnBreakEnd ?? true;
         showExitButton = dto.ShowExitButton ?? true;
-        idlePauseEnabled = dto.IdlePauseEnabled ?? true;
-        idlePauseMinutes = dto.IdlePauseMinutes ?? 5;
         standEnabled = dto.StandEnabled ?? false;
         standBreakSeconds = dto.StandBreakSeconds ?? 40;
         eyeFrequencyMinutes = dto.EyeFrequencyMinutes ?? 22;
@@ -177,8 +167,6 @@ public sealed class SettingsStore : INotifyPropertyChanged
         ShowTimerInFloating = showTimerInFloating,
         PlaySoundOnBreakEnd = playSoundOnBreakEnd,
         ShowExitButton = showExitButton,
-        IdlePauseEnabled = idlePauseEnabled,
-        IdlePauseMinutes = idlePauseMinutes,
         StandEnabled = standEnabled,
         StandBreakSeconds = standBreakSeconds,
         EyeFrequencyMinutes = eyeFrequencyMinutes,
@@ -251,8 +239,6 @@ public sealed class SettingsStore : INotifyPropertyChanged
         [JsonPropertyName("showTimerInMenuBar")] public bool? ShowTimerInFloating { get; set; }
         [JsonPropertyName("playSoundOnBreakEnd")] public bool? PlaySoundOnBreakEnd { get; set; }
         [JsonPropertyName("showExitButton")] public bool? ShowExitButton { get; set; }
-        [JsonPropertyName("idlePauseEnabled")] public bool? IdlePauseEnabled { get; set; }
-        [JsonPropertyName("idlePauseMinutes")] public int? IdlePauseMinutes { get; set; }
         [JsonPropertyName("standEnabled")] public bool? StandEnabled { get; set; }
         [JsonPropertyName("standBreakSeconds")] public int? StandBreakSeconds { get; set; }
         [JsonPropertyName("eyeFrequencyMinutes")] public int? EyeFrequencyMinutes { get; set; }
