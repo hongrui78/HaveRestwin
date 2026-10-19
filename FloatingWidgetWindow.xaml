@@ -64,19 +64,27 @@
                 CornerRadius="14" Background="#B31F1F22"
                 BorderBrush="#33FFFFFF" BorderThickness="1">
             <StackPanel Margin="16">
-                <TextBlock x:Name="HeaderText" FontWeight="Bold" FontSize="15"
-                           Foreground="White"/>
-                <TextBlock x:Name="CountdownText"
-                           HorizontalAlignment="Center"
-                           FontFamily="Consolas" FontSize="14"
-                           Foreground="#B3FFFFFF"
-                           Margin="0,10,0,0"/>
-                <TextBlock x:Name="StandText"
-                           HorizontalAlignment="Center"
-                           FontFamily="Consolas" FontSize="12"
-                           Foreground="#99FFFFFF"
-                           Margin="0,4,0,0"
-                           Visibility="Collapsed"/>
+                <!-- 护眼：标签 + 大号倒计时（时间为标签 2 倍） -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock x:Name="EyeLabel" FontSize="16"
+                               Foreground="#B3FFFFFF"
+                               VerticalAlignment="Bottom" Margin="0,0,8,7"/>
+                    <TextBlock x:Name="CountdownText"
+                               FontFamily="Consolas" FontSize="32"
+                               FontWeight="SemiBold" Foreground="White"
+                               TextWrapping="Wrap" TextAlignment="Center"/>
+                </StackPanel>
+                <!-- 站立：标签 + 大号倒计时 -->
+                <StackPanel x:Name="StandRow" Orientation="Horizontal"
+                            HorizontalAlignment="Center" Margin="0,8,0,0"
+                            Visibility="Collapsed">
+                    <TextBlock x:Name="StandLabel" FontSize="16"
+                               Foreground="#B3FFFFFF"
+                               VerticalAlignment="Bottom" Margin="0,0,8,7"/>
+                    <TextBlock x:Name="StandTimeText"
+                               FontFamily="Consolas" FontSize="32"
+                               FontWeight="SemiBold" Foreground="White"/>
+                </StackPanel>
                 <StackPanel x:Name="StandPendingBox" Visibility="Collapsed" Margin="0,8,0,0">
                     <TextBlock x:Name="StandPendingLabel"
                                HorizontalAlignment="Center"

@@ -134,6 +134,28 @@ public partial class SettingsWindow : Window
             : L10n.E(L10n.StandEnDefault, L10n.StandZhDefault);
     }
 
+    // MARK: - 关闭时提交未失去焦点的输入框
+
+    /// 数字/文字框用 LostFocus 提交：用户改完直接关窗会丢改动，这里在关闭前统一 UpdateSource
+    protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+    {
+        FlushPendingEdits(this);
+        base.OnClosing(e);
+    }
+
+    private static void FlushPendingEdits(DependencyObject root)
+    {
+        int count = System.Windows.Media.VisualTreeHelper.GetChildrenCount(root);
+        for (int i = 0; i < count; i++)
+        {
+            var child = System.Windows.Media.VisualTreeHelper.GetChild(root, i);
+            if (child is TextBox box)
+                box.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            else
+                FlushPendingEdits(child);
+        }
+    }
+
     private static string ShortVersion() =>
         typeof(SettingsWindow).Assembly.GetName().Version?.ToString(3)
         ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)

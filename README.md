@@ -50,8 +50,10 @@ winget install Microsoft.DotNet.SDK.8
 # 调试编译，产物在 bin\Debug\net8.0-windows\HaveARest.exe（需要机器装有 .NET 运行时）
 dotnet build -c Debug
 
-# 发布：免安装单文件 exe（推荐给其他人用，体积约 150MB，含运行时）
-dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o dist
+# 发布：免安装单文件 exe（推荐给其他人用，体积约 170MB，含运行时）
+# IncludeNativeLibrariesForSelfExtract 必须加上：否则 WPF 的原生 DLL 会留在 exe 旁边，
+# 单独拷贝/改名这个 exe 会启动即崩（DllNotFoundException）。
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o dist
 # ARM64 机器（如 Parallels 虚拟机）把 win-x64 换成 win-arm64
 ```
 
@@ -69,7 +71,7 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=
 ## 使用方法
 
 1. 运行后桌面右上角出现计时球（默认每 22 分钟休息 20 秒，即 20-20-20 法则）。
-2. 鼠标移到计时球上展开面板（深色半透明底）：显示倒计时与站立计时，下方一排图标：暂停/继续、重置、立刻休息、设置、退出。面板默认与计时球居中对齐，若超出屏幕则自动贴左/右边缘，保证完整可见。
+2. 鼠标移到计时球上展开面板（深色半透明底）：「护眼」+ 大号护眼倒计时、「站立」+ 大号站立倒计时，下方一排图标：暂停/继续、重置、立刻休息、设置、退出。面板默认与计时球居中对齐，若超出屏幕则自动贴左/右边缘，保证完整可见。
 3. 到点自动弹全屏白色遮罩提示休息，倒计时结束自动消失；勾选「提示面板显示退出按钮」后会出现「立即退出」。
 4. 齿轮（设置图标）打开设置窗口：通用 / 休息 / 关于三个标签，语言、间隔、时长、提示文字、预览都在这里。
 5. 电源（退出图标）退出程序。
@@ -87,6 +89,19 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=
 | `SingleInstance.cs` | Mutex 单实例（SingleInstance.swift） |
 | `Localization.cs` | 简/繁/英运行时多语言（Localization.swift） |
 | `NativeMethods.cs` | 空闲检测、显示器枚举、DPI 的 Win32 调用 |
+
+## 体积与内存（实测数据）
+
+WPF 应用有固定底座：本机实测运行内存约 95~100MB（工作集），无论怎么发布都差不多，程序自身逻辑占用可忽略。
+文件体积则取决于发布方式（均为 ARM64 实测）：
+
+| 方式 | 文件 | 内存 | 说明 |
+| --- | --- | --- | --- |
+| 自包含单文件（默认，dist 里就是这个） | 171MB | ~96MB | 免安装，拷给任何人直接跑 |
+| 自包含 + 单文件压缩（加 `-p:EnableCompressionInSingleFile=true`） | 68MB | ~197MB | 文件小一半，但解压加载导致内存翻倍，常驻小工具不划算 |
+| 框架依赖（去掉 `--self-contained`） | ~2MB | ~92MB | 最小，但对方机器要先装「.NET 8 Desktop Runtime」（约 60MB 安装包） |
+
+想进一步压文件还可以加 `-p:PublishSingleFile` 之外再删 pdb（默认就不带）；WPF 不支持 Trim（裁剪），这是 .NET 官方限制。
 
 ## 系统要求
 

@@ -57,9 +57,13 @@ public partial class App : Application
 
     private void OpenSettings()
     {
-        // 首次创建后复用同一实例：关闭再打开只是重新 Show，保留滚动位置等状态
-        settingsWindow ??= new SettingsWindow();
-        if (!settingsWindow.IsVisible) settingsWindow.Show();
+        // WPF 的 Window 关闭后不能再次 Show，所以关闭时丢弃引用，下次重新创建
+        if (settingsWindow == null)
+        {
+            settingsWindow = new SettingsWindow();
+            settingsWindow.Closed += (_, _) => settingsWindow = null;
+        }
+        settingsWindow.Show();
         settingsWindow.Activate();
     }
 }

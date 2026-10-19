@@ -225,6 +225,13 @@ public sealed class RestEngine : INotifyPropertyChanged
         Status = State.Active;
     }
 
+    /// 面板「重置」按钮专用：眼睛与站立两个周期同时从头计
+    public void ResetAll()
+    {
+        Reset();
+        RearmStandTimer();
+    }
+
     public void Pause()
     {
         if (Status != State.Active) return;

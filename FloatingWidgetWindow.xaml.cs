@@ -153,7 +153,7 @@ public partial class FloatingWidgetWindow : Window
     // MARK: - 按钮动作
 
     private void PauseToggle_Click(object sender, RoutedEventArgs e) => engine.TogglePause();
-    private void Reset_Click(object sender, RoutedEventArgs e) => engine.Reset();
+    private void Reset_Click(object sender, RoutedEventArgs e) => engine.ResetAll();
     private void RestNow_Click(object sender, RoutedEventArgs e) => engine.ManualRestNow();
     private void StartStand_Click(object sender, RoutedEventArgs e) => engine.BeginStandBreak();
     private void Settings_Click(object sender, RoutedEventArgs e) => Actions.OpenSettings?.Invoke();
@@ -167,14 +167,13 @@ public partial class FloatingWidgetWindow : Window
 
         PillText.Text = settings.ShowTimerInFloating ? engine.StatusText : MoonGlyph;
 
-        HeaderText.Text = L10n.AppName;
+        EyeLabel.Text = L10n.E("Eye Care", "护眼");
         CountdownText.Text = CountdownLine();
         PauseToggleIcon.Content = engine.Status == RestEngine.State.Paused ? PlayGlyph : PauseGlyph;
 
-        StandText.Visibility = settings.StandEnabled ? Visibility.Visible : Visibility.Collapsed;
-        StandText.Text = L10n.E(
-            $"To Stand {RestEngine.Mmss(Math.Max(0, engine.StandRemaining))}",
-            $"距站立 {RestEngine.Mmss(Math.Max(0, engine.StandRemaining))}");
+        StandRow.Visibility = settings.StandEnabled ? Visibility.Visible : Visibility.Collapsed;
+        StandLabel.Text = L10n.E("Stand", "站立");
+        StandTimeText.Text = RestEngine.Mmss(Math.Max(0, engine.StandRemaining));
 
         bool pending = engine.Status == RestEngine.State.StandPending;
         StandPendingBox.Visibility = pending ? Visibility.Visible : Visibility.Collapsed;
@@ -190,9 +189,9 @@ public partial class FloatingWidgetWindow : Window
         ToolTipService.SetToolTip(Pill, L10n.E("Hover to open panel", "悬停展开控制面板"));
     }
 
+    // 暂停时不再显示「计时已暂停」，直接显示冻结的倒计时（引擎暂停时本就不减 EyeRemaining）
     private string CountdownLine() => engine.Status switch
     {
-        RestEngine.State.Paused => L10n.E("Timer Paused", "计时已暂停"),
         RestEngine.State.RestingEye => RestOverlayController.Shared.IsClosed
             ? L10n.E("Resting", "休息中")
             : L10n.E($"Rest {RestEngine.Mmss(Math.Max(0, RestOverlayController.Shared.Remaining))}",
